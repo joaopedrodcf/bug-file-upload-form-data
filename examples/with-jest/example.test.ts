@@ -1,46 +1,20 @@
-it('receives a mocked response to a REST API request', async () => {
-  const response = await fetch('https://api.example.com/user')
-
-  expect(response.status).toBe(200)
-  expect(response.statusText).toBe('OK')
-  expect(await response.json()).toEqual({
-    firstName: 'John',
-    lastName: 'Maverick',
+it('respects File in request body when invalid.csv', async () => {
+    const file = new File(['a,b,c\n1,2,3'], 'invalid.csv', {
+        type: 'text/csv',
+    });
+  
+    const formData = new FormData()
+    formData.set('file', file)
+  
+    const response = await fetch('https://api.example.com/upload-csv-file', {
+      method: 'POST',
+      body: formData,
+    })
+  
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({
+      message: 'Invalid csv',
+    })
   })
-})
-
-it('receives a mocked response to a GraphQL API request', async () => {
-  const response = await fetch('https://api.example.com/graphql', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      query: `
-        query ListMovies {
-          movies {
-            title
-          }
-        }
-      `,
-    }),
-  })
-
-  expect(response.status).toBe(200)
-  expect(response.statusText).toBe('OK')
-  expect(await response.json()).toEqual({
-    data: {
-      movies: [
-        {
-          title: 'The Lord of The Rings',
-        },
-        {
-          title: 'The Matrix',
-        },
-        {
-          title: 'Star Wars: The Empire Strikes Back',
-        },
-      ],
-    },
-  })
-})
+  
+  
